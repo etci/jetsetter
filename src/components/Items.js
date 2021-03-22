@@ -4,29 +4,33 @@ import Filter from './Filter';
 
 class Items extends Component {
   state = {
-    // What state does this component have?
+    searchTerm: ''
   };
 
-  updateSearchTerm = searchTerm => {};
+  updateSearchTerm = searchTerm => {
+    this.setState({
+      searchTerm
+    });
+  };
 
   render() {
-    const { title, items } = this.props;
+    const { title, items, onRemove, onCheck } = this.props;
+    const { searchTerm } = this.state;
     return (
       <section className="Items">
         <h2>
           {title} ({items.length})
         </h2>
-        <Filter searchTerm={''} onChange={this.updateSearchTerm} />
+        <Filter searchTerm={searchTerm} onChange={this.updateSearchTerm} />
         {items
           .filter(item =>
-            // Hmm… this needs some work.
-            item.value.toLowerCase().includes(''.toLowerCase()),
+            item.value.toLowerCase().includes(searchTerm.toLowerCase()),
           )
           .map(item => (
             <Item
               key={item.id}
-              onCheckOff={() => {}}
-              onRemove={() => {}}
+              onCheck={onCheck}
+              onRemove={onRemove}
               item={item}
             />
           ))}

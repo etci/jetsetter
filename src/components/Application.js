@@ -22,23 +22,66 @@ const defaultState = [
 
 class Application extends Component {
   state = {
-    // Set the initial state,
+    items: [...defaultState]
   };
 
   // How are we going to manipulate the state?
   // Ideally, users are going to want to add, remove,
   // and check off items, right?
 
-  render() {
-    // Get the items from state
+  addItem = (item) => {
+    const { items } = this.state;
+    this.setState({ 
+      items: [
+        ...items,
+        item
+      ] 
+    });
+  }
 
+  removeItem = (id) => {
+    const { items } = this.state;
+    const newItems = items.filter(({ id: itemId }) => itemId !== id).map(item => ({ ...item }));
+    this.setState({
+      items: newItems
+    })
+  }
+
+  toggleCheck = (id) => {
+    const { items } = this.state;
+    const newItems = items.map(item => {
+      if (item.id === id) {
+        return { ...item, packed: !item.packed };
+      }
+      return item;
+    });
+    this.setState({ items: newItems });
+  }
+
+  markAllAsUnpacked = () => {
+    const { items } = this.state;
+    const newItems = items.map(item => {
+      return {
+        ...item,
+        packed: false
+      };
+    });
+    this.setState({
+      items: newItems
+    });
+  }
+
+  render() {
+    const { items } = this.state;
+    const unpackedItems = items.filter(({ packed }) => !packed);
+    const packedItems = items.filter(({ packed }) => packed);
     return (
       <div className="Application">
-        <NewItem />
+        <NewItem onSubmit={this.addItem} />
+        <Items onRemove={this.removeItem} onCheck={this.toggleCheck} title="Unpacked Items" items={unpackedItems} />
         <CountDown />
-        <Items title="Unpacked Items" items={[]} />
-        <Items title="Packed Items" items={[]} />
-        <button className="button full-width">Mark All As Unpacked</button>
+        <Items title="Packed Items" items={packedItems} onRemove={this.removeItem} onCheck={this.toggleCheck} />
+        <button className="button full-width" onClick={this.markAllAsUnpacked}>Mark All As Unpacked</button>
       </div>
     );
   }
